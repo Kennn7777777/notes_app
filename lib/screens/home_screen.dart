@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:notes_app/common/constants/app_colors.dart';
+import 'package:notes_app/common/providers/filter_list_provider.dart';
 import 'package:notes_app/common/providers/note_list_provider.dart';
 import 'package:notes_app/common/providers/search_term_provider.dart';
 import 'package:notes_app/common/router/route_names.dart';
@@ -29,31 +30,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
-  List<Note> filterList(List<Note> noteList) {
-    final searchTerm = ref.watch(searchTermProvider);
-
-    List<Note> tempList = noteList;
-
-    if (searchTerm.isNotEmpty) {
-      tempList = noteList.where((note) => note.title.toLowerCase().contains(searchTerm.toLowerCase())).toList();
-    }
-
-    return tempList;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: SafeArea(
             child: Consumer(
                 builder: (context, ref, child) {
-                  print("rebuild");
                   final notes = ref.watch(noteListProvider);
-                  // final filterNotes = ref.watch(filterListProvider);
 
                   return notes.when(
                       data: (notes) {
-                        final filteredList = filterList(notes);
+                        final filteredList = ref.watch(filterListProvider(notes));
 
                         return SingleChildScrollView(
                           child: Column(
